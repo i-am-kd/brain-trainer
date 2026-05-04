@@ -1,0 +1,21 @@
+{
+  "name": "@brain-trainer-game/utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@brain-trainer-game/types": "*"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch" : "vitest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "vitest": "^4.1.5"
+  }
+}

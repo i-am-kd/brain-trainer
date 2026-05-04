@@ -1,0 +1,14 @@
+{
+  "name": "@brain-trainer-game/types",
+  "version": "1.0.0",
+  "description": "Shared ts types for brain trainer",
+  "main": "./src/index.js",
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
