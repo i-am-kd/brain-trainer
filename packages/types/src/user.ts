@@ -6,8 +6,14 @@ export interface User {
     createdAt: Date;
 }
 
+export interface PublicUser {
+    _id: string;
+    email: string;
+    username: string;
+}
+
 export interface AuthResponse{
     token: string;
-    user: Omit<User, 'passwordHash'>;
+    user: PublicUser  //Omit<User, 'passwordHash'>;
 }
 

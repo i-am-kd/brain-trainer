@@ -1,6 +1,7 @@
 import express, {Request, Response} from 'express';
 import { calculateScore } from '@brain-trainer-game/utils';
-
+import authRoutes from './modules/auth/auth.routes.ts';
+import gameRoutes from './modules/game/game.routes.ts';
 
 const app = express();
 app.use(express.json());
@@ -9,9 +10,14 @@ app.use(express.json());
 app.get('/health', (req: Request, res: Response)=>{
     res.status(200).json({
         status: "OK",
-        timeStamp: new Date().toISOString(),
-        sampleScore: calculateScore(true, 'hard', 10000)
-    });
+        timeStamp: new Date().toISOString()
+     });
+     
 });
+
+app.use('/api/auth', authRoutes);
+app.use('/api/game', gameRoutes);
+
+
 
 export default app;
