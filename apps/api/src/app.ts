@@ -1,5 +1,4 @@
 import express, {Request, Response} from 'express';
-import { calculateScore } from '@brain-trainer-game/utils';
 import authRoutes from './modules/auth/auth.routes.ts';
 import gameRoutes from './modules/game/game.routes.ts';
 
