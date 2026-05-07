@@ -5,10 +5,25 @@ import { calculateScore } from "@brain-trainer-game/utils";
 import { useAuthStore } from "../../../store/useAuthStore.js";
 import { useNavigate } from "react-router-dom";
 
+const COUNT_DOWN ={
+  easy: 10000,
+  medium: 15000,
+  hard: 20000,
+} as const;
+
+// type Difficulty = keyof typeof COUNT_DOWN;
+
 export const GameScreen: React.FC = () => {
   const [userInput, setUserInput] = useState("");
   const [startTime, setStartTime] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  //count down states
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [showSequence, setShowSequence] = useState(true);
+  const [gamePhase, setGamePhase] = useState<"memorize" | "input" | "result">(
+    "memorize",
+  );
 
   const { logout } = useAuthStore();
   const navigate = useNavigate();
@@ -17,6 +32,37 @@ export const GameScreen: React.FC = () => {
     queryKey: ["sequence"],
     queryFn: gameApi.getSequence,
   });
+
+  useEffect(() => {
+    if (sequence) {
+      setStartTime(Date.now());
+      const duration = COUNT_DOWN[sequence.difficulty];
+      setTimeLeft(duration);
+      setShowSequence(true);
+      setGamePhase("memorize");
+      setIsSubmitted(false);
+      setUserInput("");
+    }
+  }, [sequence]);
+
+  // count-down time
+  useEffect(() => {
+    if (gamePhase !== "memorize" || timeLeft <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1000) {
+          clearInterval(interval);
+          setShowSequence(false);
+          setGamePhase("input");
+          return 0;
+        }
+        return prev - 1000;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [gamePhase, timeLeft]);
 
   //submit result
   const submitMutation = useMutation({
@@ -29,23 +75,20 @@ export const GameScreen: React.FC = () => {
       });
     },
     onSuccess: (data) => {
-      alert(`Game OVer! Score: ${data.score}. ${data.feedback}`);
+      alert(`Game Over! Score: ${data.score}. ${data.feedback}`);
       globalThis.location.reload();
     },
   });
 
-  useEffect(() => {
-    if (sequence) setStartTime(Date.now());
-  }, [sequence]);
-
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
-    if (!sequence) return;
+    if (!sequence || gamePhase ==='result') return;
 
     // simple split by comma or space for MVP
     const words = userInput.split(/[\s,]+/).filter((w) => w.length > 0);
     submitMutation.mutate(words);
     setIsSubmitted(true);
+    setGamePhase('result');
   };
 
   const handleLogout = () => {
@@ -54,6 +97,9 @@ export const GameScreen: React.FC = () => {
       navigate("/login");
     }
   };
+  
+  //formatting millisecond into second 
+  const formatTime = (ms: number) => Math.ceil(ms/1000);
 
   if (isLoading) {
     return (
@@ -83,6 +129,7 @@ export const GameScreen: React.FC = () => {
           <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
             Brain Trainer
           </h2>
+
           <button
             onClick={handleLogout}
             className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
@@ -93,11 +140,23 @@ export const GameScreen: React.FC = () => {
 
         {/* Word Display */}
         <div className="bg-blue-50 p-8 rounded-lg mb-8 border border-blue-100 text-center">
-          <p className="text-2xl font-mono text-blue-900 tracking-wide leading-relaxed">
-            {sequence.words.join(" ")}
-          </p>
+          <div className="p-8 rounded-lg mb-8 border text-center transition-all duration-500 ">
+            {showSequence ? (
+              <p className="text-2xl font-mono text-blue-900 tracking-wide leading-relaxed">
+                {sequence.words.join(" ")}
+              </p>
+            ) : (
+              <p className="text-gray-500 text-lg font-medium">
+                🧠 Words hidden! Type from memory
+              </p>
+            )}
+          </div>
+
           <div className="mt-4 inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-full">
-            Difficulty: {sequence.difficulty}
+            Difficulty: {sequence.difficulty}{" "}
+          </div>
+          <div className="mt-4 inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wider rounded-full">
+            {gamePhase === "memorize" ? ` ⏱️: ${formatTime(timeLeft)}` : "⏱️"}
           </div>
         </div>
 
@@ -112,18 +171,24 @@ export const GameScreen: React.FC = () => {
           <textarea
             className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow font-mono text-lg"
             rows={3}
-            placeholder="Start typing..."
+            placeholder={gamePhase ==='memorize' ? 'Memorize the words above!': "Start typing..."}
             value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            autoFocus
+            onChange={(e) => setUserInput(e.target.value)} disabled ={gamePhase!=='input'}
+            autoFocus = {gamePhase ==='input'}
           />
 
           <button
             type="submit"
-            disabled={submitMutation.isPending || !userInput.trim()||isSubmitted}
+            disabled={
+              submitMutation.isPending || !userInput.trim() || isSubmitted
+            }
             className="w-full mt-4 bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
           >
-            {submitMutation.isPending ? "Checking..." : isSubmitted? "Submitted": "Submit Answer"}
+            {submitMutation.isPending
+              ? "Checking..."
+              : isSubmitted
+                ? "Submitted"
+                : "Submit Answer"}
           </button>
         </form>
 
@@ -148,4 +213,4 @@ export const GameScreen: React.FC = () => {
       </div>
     </div>
   );
-};
+};;
