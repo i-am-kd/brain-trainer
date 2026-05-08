@@ -1,0 +1,32 @@
+name: CI
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+    maxtrix:
+      node-version: [24.0]
+  steps:
+    - uses: actions/checkout@v5
+    
+    - name: Use Node.js ${{matrix.node-version}}
+      uses: actions/checkout@v5
+      with:
+        node-verison: ${{matrix.node-version}}
+        cache: 'npm'
+    - name: install dependencies 
+      run: npm run ci 
+
+    - name: Lint
+      run: npm run lint --workspaces --if-present
+
+    - name: Test 
+      run: npm run test --workspaces --if-present
+
+    - name: build 
+      run: npm run build --workspaces --if-present
