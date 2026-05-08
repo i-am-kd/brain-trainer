@@ -9,16 +9,17 @@ describe("calculateScore", () =>{
 
     it("should reutrn base score for easy difficulty with slow time", ()=>{
         const score = calculateScore(true, 'easy', 35000);
-        expect(score).toBe(15);
+        expect(score).toBe(100);
     });
 
     it("should return base score+max bonus for fast completion", () =>{
         const score = calculateScore (true, 'medium', 4000);
-        expect(score).toBe(45)
+        expect(score).toBe(300)
     });
 
     it('should return base score + partial bonus for medium time', () =>{
         const score = calculateScore(true, 'hard', 17500);
-        expect(score).toBe(75);
+        expect(score).toBe(580);
     });
+
 });

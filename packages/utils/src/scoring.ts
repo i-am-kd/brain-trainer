@@ -14,21 +14,25 @@ export const calculateScore = (isCorrect: boolean,  difficulty: Difficulty,  dur
 
     //base score per difficulty 
     const baseScore: Record <Difficulty, number> ={
-        easy: 15, 
-        medium: 35,
-        hard: 70,
+        easy: 100, 
+        medium: 200,
+        hard: 400,
     };
 
-    let score = baseScore[difficulty];
-    const maxTimeForBonus = 30000; //30 second 
-    const minTimeForFullBonus = 5000; //5 second 
-
-    if (durationMs < minTimeForFullBonus){
-        score +=10;
-    } else if (durationMs < maxTimeForBonus){
-        const ratio = 1 - (durationMs - minTimeForFullBonus) / (maxTimeForBonus- minTimeForFullBonus);
-        score += Math.round(10*ratio)
+    const timeLimits : Record<Difficulty, {target:number; max: number}> ={
+        easy: {target: 8000, max: 20000},
+        medium: {target: 12000, max: 30000},
+        hard: {target: 15000, max: 40000}
     }
 
-    return score;
+    const {target, max} = timeLimits[difficulty];
+    let score = baseScore[difficulty];
+    if(durationMs <= target) {
+        score+=Math.round(baseScore[difficulty]*0.5);
+    }else if(durationMs <max){
+        const ratio = 1- (durationMs -target) / (max-target);
+        score+= Math.round(baseScore[difficulty]*0.5*ratio)
+    }
+
+    return Math.round(score)
 }

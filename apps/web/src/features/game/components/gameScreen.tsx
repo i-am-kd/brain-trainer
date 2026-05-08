@@ -4,6 +4,7 @@ import { gameApi } from "../api/gameApi.js";
 import { calculateScore } from "@brain-trainer-game/utils";
 import { useAuthStore } from "../../../store/useAuthStore.js";
 import { useNavigate } from "react-router-dom";
+import { checkAnswer } from "../helper/checkAnswer.js";
 
 const COUNT_DOWN ={
   easy: 10000,
@@ -24,6 +25,7 @@ export const GameScreen: React.FC = () => {
   const [gamePhase, setGamePhase] = useState<"memorize" | "input" | "result">(
     "memorize",
   );
+  const [gameResult, setGameResult] = useState<{isCorrect: boolean; score: number; correctWords: string[]} |null >(null);
 
   const { logout } = useAuthStore();
   const navigate = useNavigate();
@@ -86,9 +88,13 @@ export const GameScreen: React.FC = () => {
 
     // simple split by comma or space for MVP
     const words = userInput.split(/[\s,]+/).filter((w) => w.length > 0);
-    submitMutation.mutate(words);
+    const isCorrect  = checkAnswer(userInput, sequence.words);
+    const score = calculateScore(isCorrect, sequence.difficulty, Date.now()-startTime);
+    setGameResult({isCorrect, score, correctWords: sequence.words});
+
     setIsSubmitted(true);
     setGamePhase('result');
+    submitMutation.mutate(words);
   };
 
   const handleLogout = () => {
@@ -142,7 +148,7 @@ export const GameScreen: React.FC = () => {
         <div className="bg-blue-50 p-8 rounded-lg mb-8 border border-blue-100 text-center">
           <div className="p-8 rounded-lg mb-8 border text-center transition-all duration-500 ">
             {showSequence ? (
-              <p className="text-2xl font-mono text-blue-900 tracking-wide leading-relaxed">
+              <p data-testid= "sequence" className="text-2xl font-mono text-blue-900 tracking-wide leading-relaxed">
                 {sequence.words.join(" ")}
               </p>
             ) : (
@@ -194,15 +200,15 @@ export const GameScreen: React.FC = () => {
 
         {/* Live Score Preview */}
         <div className="mt-8 text-center border-t pt-4">
-          {isSubmitted && (
+          {isSubmitted && gameResult  &&(
             <p className="text-sm text-gray-500">
-              Current Estimated Score:{" "}
+              {gameResult.isCorrect? (
+                <span className="text-green-600"> Correct | </span>
+              ):(
+                <span className="text-red-600">Incorrect | </span>
+              )}
+              Your Score:{gameResult.score}
               <span className="ml-2 font-bold text-gray-800 text-lg">
-                {calculateScore(
-                  true,
-                  sequence.difficulty,
-                  Date.now() - startTime,
-                )}
               </span>
             </p>
           )}
