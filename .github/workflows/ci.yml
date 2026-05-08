@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-    maxtrix:
-      node-version: [24.0]
-  steps:
+      matrix:
+        node-version: [24.0]
+    steps:
     - uses: actions/checkout@v5
     
     - name: Use Node.js ${{matrix.node-version}}
