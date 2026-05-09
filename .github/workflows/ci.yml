@@ -20,7 +20,7 @@ jobs:
         node-verison: ${{matrix.node-version}}
         cache: 'npm'
     - name: install dependencies 
-      run: npm run ci 
+      run: npm ci 
 
     - name: Lint
       run: npm run lint --workspaces --if-present
