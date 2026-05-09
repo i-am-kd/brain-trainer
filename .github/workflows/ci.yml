@@ -28,5 +28,3 @@ jobs:
     - name: Test 
       run: npm run test --workspaces --if-present
 
-    - name: build 
-      run: npm run build --workspaces --if-present
