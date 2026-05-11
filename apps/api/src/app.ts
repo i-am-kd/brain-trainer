@@ -1,6 +1,7 @@
 import express, {Request, Response} from 'express';
 import authRoutes from './modules/auth/auth.routes.ts';
 import gameRoutes from './modules/game/game.routes.ts';
+import aiRoutes from './modules/ai/ai.routes.ts';
 
 const app = express();
 app.use(express.json());
@@ -16,6 +17,7 @@ app.get('/health', (req: Request, res: Response)=>{
 
 app.use('/api/auth', authRoutes);
 app.use('/api/game', gameRoutes);
+app.use('/api/admin/ai', aiRoutes)
 
 
 

@@ -1,15 +1,22 @@
 import { GameSession } from "../../db/models/GameSession.ts";
 import { calculateScore } from "@brain-trainer-game/utils";
 import { Difficulty, GameResult } from "@brain-trainer-game/types";
+import { WordSequence } from "../../db/models/wordSequence.js";
 
-const WORD_SEQUENCE  = [
-    {id: 'seq_1', words:['apple', 'banana', 'cherry'], difficulty: 'easy' as Difficulty},
-    {id:'seq_2', words: ['elephant, giraffe, hippopotamus'], difficulty: 'medium' as Difficulty}
-];
+
+
 
 export const GameService = {
-    async getSquence(): Promise<typeof WORD_SEQUENCE[0] | undefined>{
-        return WORD_SEQUENCE[Math.floor(Math.random() *WORD_SEQUENCE.length)];
+    async getSquence(){
+        const sequence = await WordSequence.aggregate([
+            {$match: {isActive: true}},
+            {$sample: {size: 1}}
+        ]);
+
+        if (!sequence || sequence.length ===0){
+            throw new Error ("No sequences available. Please ask admin to generaet content.");
+        }
+        return sequence[0];
     },
 
     async submitResult(
@@ -18,7 +25,7 @@ export const GameService = {
         userInput: string[],
         durationMs: number
     ): Promise<GameResult>{
-        const sequence = WORD_SEQUENCE.find((s) => s.id === sequenceId);
+        const sequence = await WordSequence.findById(sequenceId);
         if(!sequence) throw new Error("Invalid Sequence ID");
 
         //check correctness 
