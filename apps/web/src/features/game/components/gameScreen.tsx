@@ -14,7 +14,7 @@ const COUNT_DOWN ={
   hard: 20000,
 } as const;
 
-// type Difficulty = keyof typeof COUNT_DOWN;
+type  Difficulty = keyof typeof COUNT_DOWN;
 
 export const GameScreen: React.FC = () => {
   const [userInput, setUserInput] = useState("");
@@ -41,7 +41,8 @@ export const GameScreen: React.FC = () => {
   useEffect(() => {
     if (sequence) {
       setStartTime(Date.now());
-      const duration = COUNT_DOWN[sequence.difficulty];
+      const difficultyKey = sequence.difficulty as Difficulty
+      const duration = COUNT_DOWN[difficultyKey];
       setTimeLeft(duration);
       setShowSequence(true);
       setGamePhase("memorize");
