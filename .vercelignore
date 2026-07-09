@@ -1,0 +1,9 @@
+# Ignore all test files during Vercel deployment builds
+**/*.test.ts
+**/*.test.tsx
+**/*.test.js
+**/*.test.jsx
+**/*.spec.ts
+**/*.spec.tsx
+**/__tests__/
+**/tests/
