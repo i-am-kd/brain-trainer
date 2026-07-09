@@ -5,6 +5,8 @@ import { calculateScore } from "@brain-trainer-game/utils";
 import { useAuthStore } from "../../../store/useAuthStore.js";
 import { useNavigate } from "react-router-dom";
 import { checkAnswer } from "../helper/checkAnswer.js";
+import { useConfirm } from "@brain-trainer-game/utils/src/hooks/useConfirm.js";
+import { ConfirmModel } from "@brain-trainer-game/utils/src/components/confirmModel.js";
 
 const COUNT_DOWN ={
   easy: 10000,
@@ -29,6 +31,7 @@ export const GameScreen: React.FC = () => {
 
   const { logout } = useAuthStore();
   const navigate = useNavigate();
+  const {confirm, isOpen, message, handleConfirm, handleCancel} = useConfirm();
 
   const { data: sequence, isLoading } = useQuery({
     queryKey: ["sequence"],
@@ -97,8 +100,9 @@ export const GameScreen: React.FC = () => {
     submitMutation.mutate(words);
   };
 
-  const handleLogout = () => {
-    if (globalThis.confirm("Are you sure you want to logout?")) {
+  const handleLogout = async () => {
+    const confirmed = await confirm("Logout session?");
+    if (confirmed) {
       logout();
       navigate("/login");
     }
@@ -142,6 +146,7 @@ export const GameScreen: React.FC = () => {
           >
             Logout
           </button>
+          <ConfirmModel isOpen = {isOpen} message={message} onConfirm={handleConfirm} onCancel={handleCancel} />
         </div>
 
         {/* Word Display */}

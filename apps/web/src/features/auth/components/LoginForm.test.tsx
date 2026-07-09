@@ -42,7 +42,7 @@ describe('LoginForm', () =>{
     it('call login API on submit', async () =>{
         const mockLogin = vi.spyOn(authApi.authApi, 'login').mockResolvedValue({
             token :'fake-token', 
-            user: {_id: "1", email: 'test@test.com', username: 'test'}
+            user: {_id: "1", email: 'test@test.com', username: 'test', role: 'user'}
         });
 
         renderWithProvider(<LoginForm />);

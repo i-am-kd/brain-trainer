@@ -4,6 +4,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LoginForm } from "./features/auth/components/LoginForm.js";
 import { GameScreen } from "./features/game/components/gameScreen.js";
 import { useAuthStore } from "./store/useAuthStore.js";
+import { AdminPanel } from "./features/admin/components/AdminPanel.js";
+import { AdminRoute } from "./features/admin/components/AdminRoute.js";
+import { useEffect } from "react";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({children}: {children: React.ReactNode}) =>{
@@ -12,6 +15,11 @@ const ProtectedRoute = ({children}: {children: React.ReactNode}) =>{
 };
 
 function App() {
+    const {checkAuth} = useAuthStore();
+
+    useEffect(()=>{
+        checkAuth();
+    }, []);
   return (
     <QueryClientProvider client={queryClient}>
         <BrowserRouter>
@@ -19,8 +27,8 @@ function App() {
                 <Routes>
                     <Route path="/login" element={<LoginForm />}/>
                     <Route path="/game" element={<ProtectedRoute><GameScreen/></ProtectedRoute>} />
-
-                    <Route  path="/" element={<Navigate to ="/game" />}/>
+                    <Route path='/admin' element ={<AdminRoute><AdminPanel /></AdminRoute>} />
+                    <Route  path="/" element={<Navigate to ="/login" />}/>
                 </Routes>
             </div>
         </BrowserRouter>

@@ -7,21 +7,27 @@ const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
 
 export const AuthService = {
-    async register(email: string, username: string, passwrod: string): Promise<AuthResponse>{
+    async register(email: string, username: string, passwrod: string, role: 'user' | 'admin'): Promise<AuthResponse>{
         const existingUser  = await User.findOne({$or: [{email}, {username}]});
         if (existingUser) throw new Error("User already exists.");
 
         const passwordHash = await bcrypt.hash(passwrod, 10);
-        const user = await User.create({email, username, passwordHash});
+        const user = await User.create({
+            email, 
+            username, 
+            passwordHash,
+            role: role ==='admin'? 'admin': 'user',
+        });
 
-        const token = jwt.sign({id: user._id}, JWT_SECRET, {expiresIn: '5h'});
+        const token = jwt.sign({id: user._id, role: user.role}, JWT_SECRET, {expiresIn: '5h'});
 
         return {
             token, 
             user: {
                 _id: user._id.toString(),
                 email: user.email, 
-                username: user.username
+                username: user.username,
+                role: user.role,
             },
         };
     },
@@ -33,7 +39,7 @@ export const AuthService = {
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if(!isMatch) throw new Error("Invalid Crendentials.");
 
-        const token = jwt.sign({id: user._id}, JWT_SECRET, {expiresIn: "1d"});
+        const token = jwt.sign({id: user._id, role: user.role}, JWT_SECRET, {expiresIn: "5h"});
 
         return {
             token, 
@@ -41,6 +47,7 @@ export const AuthService = {
                 _id: user._id.toString(),
                 email: user.email,
                 username: user.username,
+                role: user.role,
             },
         };
     },

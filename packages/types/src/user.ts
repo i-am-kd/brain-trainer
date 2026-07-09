@@ -3,13 +3,15 @@ export interface User {
     email: string;
     username: string;
     passwordHash?: string; // used internally by backend 
-    createdAt: Date;
+    role?: 'user' | 'admin';
+    createdAt?: Date;
 }
 
 export interface PublicUser {
     _id: string;
     email: string;
     username: string;
+    role: string;
 }
 
 export interface AuthResponse{

@@ -14,7 +14,13 @@ export const LoginForm: React.FC = () =>{
         mutationFn: () =>authApi.login(email, password),
         onSuccess: (data) =>{
             login(data.user, data.token);
-            navigate('/game');
+            if (data.user.role ==='admin'){
+              navigate('/admin')
+            }
+            else{
+                navigate('/game')
+            }
+            
         },
         onError: (error) =>{
             alert("Login failed: "+ error.message);

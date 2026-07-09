@@ -43,7 +43,7 @@
     // "moduleDetection": "force",
     // "skipLibCheck": true,
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../../packages/utils/src/hooks", "../../packages/utils/src/components/confirmModel.tsx"],
   "references": [
     { "path": "../../packages/types" },
     { "path": "../../packages/utils" }

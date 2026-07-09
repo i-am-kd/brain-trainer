@@ -2,3 +2,7 @@ node_modules/
 dist/
 .env
 .DB_Store
+**/*.test.ts
+**/*.spec.ts
+**/tests/
+**/__tests__/

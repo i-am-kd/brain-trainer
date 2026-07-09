@@ -6,7 +6,7 @@ const GenerationSchema = z.object({
     topic: z.string().min(3),
     count: z.number().min(3).max(10),
     difficulty: z.enum(['easy', 'medium', 'hard']),
-    wordsPerSequence: z.number().min(5).max(40),
+    wordsPerSequence: z.number().min(5).max(20),
 });
 
 export const AIController = {
